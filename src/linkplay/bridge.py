@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+import urllib
 
 from linkplay.consts import (
     INPUT_MODE_MAP,
@@ -147,6 +148,11 @@ class LinkPlayPlayer:
         await self.bridge.request(
             LinkPlayCommand.SWITCH_MODE.format(PLAY_MODE_SEND_MAP[mode])
         )  # type: ignore[str-format]
+
+    async def play_notification_sound(self, url: str) -> None:
+        """Plays a notification sound."""
+        encoded_url = urllib.parse.quote_plus(url)
+        await self.bridge.request(LinkPlayCommand.PLAY_NOTIFICATION_SOUND.format(url))
 
     @property
     def muted(self) -> bool:
