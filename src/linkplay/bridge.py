@@ -240,6 +240,9 @@ class LinkPlayBridge:
         """Performs a GET request on the given command and verifies the result."""
         await self.endpoint.request(command)
 
+    async def raw_request(self, command: str, timeout: int | None = None) -> str:
+        return await self.endpoint.raw_request(command, timeout)
+
 
 class LinkPlayMultiroom:
     """Represents a LinkPlay multiroom group. Contains a leader and a list of followers.

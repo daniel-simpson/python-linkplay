@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from aiohttp import ClientSession
 
-from linkplay.utils import session_call_api_json, session_call_api_ok
+from linkplay.utils import session_call_api, session_call_api_json, session_call_api_ok
 
 
 class LinkPlayEndpoint(ABC):
@@ -15,6 +15,10 @@ class LinkPlayEndpoint(ABC):
     @abstractmethod
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a request on the given command and returns the result as a JSON object."""
+
+    @abstractmethod
+    async def raw_request(self, command: str, timeout: int | None) -> str:
+        """Performs a request and returns a raw, strinigified response"""
 
 
 class LinkPlayApiEndpoint(LinkPlayEndpoint):
@@ -35,6 +39,11 @@ class LinkPlayApiEndpoint(LinkPlayEndpoint):
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
         return await session_call_api_json(self._endpoint, self._session, command)
+    
+    async def raw_request(self, command: str, timeout: int | None) -> str:
+        """Performs a GET request on the given command and returns the result as is."""
+        return await session_call_api(self._endpoint, self._session, command, timeout)
+
 
     def __str__(self) -> str:
         return self._endpoint

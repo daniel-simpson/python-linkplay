@@ -15,7 +15,7 @@ from linkplay.consts import API_ENDPOINT, API_TIMEOUT, MTLS_CERTIFICATE_CONTENTS
 from linkplay.exceptions import LinkPlayRequestException
 
 
-async def session_call_api(endpoint: str, session: ClientSession, command: str) -> str:
+async def session_call_api(endpoint: str, session: ClientSession, command: str, timeout: int | None = None) -> str:
     """Calls the LinkPlay API and returns the result as a string.
 
     Args:
@@ -32,7 +32,7 @@ async def session_call_api(endpoint: str, session: ClientSession, command: str) 
     url = API_ENDPOINT.format(endpoint, command)
 
     try:
-        async with async_timeout.timeout(API_TIMEOUT):
+        async with async_timeout.timeout(timeout or API_TIMEOUT):
             response = await session.get(url)
 
     except (asyncio.TimeoutError, ClientError, asyncio.CancelledError) as error:
