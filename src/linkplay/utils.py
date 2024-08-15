@@ -5,7 +5,7 @@ import os
 import socket
 import ssl
 from http import HTTPStatus
-from typing import Dict
+from typing import Dict, TypeVar
 
 import aiofiles
 import async_timeout
@@ -74,6 +74,13 @@ def decode_hexstr(hexstr: str) -> str:
     except ValueError:
         return hexstr
 
+T = TypeVar("T")
+def get_typed_dict(dictionary: dict[str, str], keys: T) -> dict[T, str]:
+    """Returns a dictionary with the given keys typed to T."""
+    d: dict[T,str] = {}
+    for key in keys:
+        d[key] = dictionary[key] if key in dictionary else ""
+    return d
 
 def create_unverified_context() -> ssl.SSLContext:
     """Creates an unverified SSL context with the default mTLS certificate."""

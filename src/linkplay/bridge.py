@@ -19,7 +19,7 @@ from linkplay.consts import (
     SpeakerType,
 )
 from linkplay.endpoint import LinkPlayEndpoint
-from linkplay.utils import decode_hexstr
+from linkplay.utils import decode_hexstr, get_typed_dict
 
 
 class LinkPlayDevice:
@@ -83,10 +83,11 @@ class LinkPlayPlayer:
 
     async def update_status(self) -> None:
         """Update the player status."""
-        self.properties = await self.bridge.json_request(LinkPlayCommand.PLAYER_STATUS)  # type: ignore[assignment]
-        self.properties[PlayerAttribute.TITLE] = decode_hexstr(self.title)
-        self.properties[PlayerAttribute.ARTIST] = decode_hexstr(self.artist)
-        self.properties[PlayerAttribute.ALBUM] = decode_hexstr(self.album)
+        properties: dict[str, str] = await self.bridge.json_request(LinkPlayCommand.PLAYER_STATUS)
+
+        typed_dict = get_typed_dict(properties, PlayerAttribute)
+
+        self.properties = typed_dict
 
     async def next(self) -> None:
         """Play the next song in the playlist."""
@@ -156,17 +157,17 @@ class LinkPlayPlayer:
     @property
     def title(self) -> str:
         """Returns if the currently playing title of the track."""
-        return self.properties.get(PlayerAttribute.TITLE, "")
+        return decode_hexstr(self.properties.get(PlayerAttribute.TITLE, ""))
 
     @property
     def artist(self) -> str:
         """Returns if the currently playing artist."""
-        return self.properties.get(PlayerAttribute.ARTIST, "")
+        return decode_hexstr(self.properties.get(PlayerAttribute.ARTIST, ""))
 
     @property
     def album(self) -> str:
         """Returns if the currently playing album."""
-        return self.properties.get(PlayerAttribute.ALBUM, "")
+        return decode_hexstr(self.properties.get(PlayerAttribute.ALBUM, ""))
 
     @property
     def volume(self) -> int:
